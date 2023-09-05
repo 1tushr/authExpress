@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-dotenv.config = { path: "./config.env" };
+const dotenv =require('dotenv');
+dotenv.config({ path: './config.env' });
 const authController = require("./controllers/authController");
 
 const URI = process.env.MONGO_URI;
