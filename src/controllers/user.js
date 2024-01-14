@@ -1,7 +1,10 @@
 const User = require("../models/user-model");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 const SALT_ROUNDS = 10;
+const dotenv = require("dotenv")
+
+dotenv.config()
 
 async function handleUserSignup(req, res) {
     try {
@@ -32,18 +35,29 @@ async function handleUserLogin(req, res) {
         if (!(await bcrypt.compare(password, matchUser.password))) {
             return res.status(401).json({ message: "Incorrect password" });
         }
-
+        const token= jwt.sign({user : {id: matchUser._id}},process.env.SECRET_TOKEN,{expiresIn: process.env.EXPIRY_TIME})
         const userObject = matchUser.toObject();
         delete userObject.password;
 
-        res.json({ message: "User authentication success", user: userObject });
+        res.json({ message: "User authentication success", user: userObject, token});
     } catch (error) {
         console.error("Error occurred:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
 
+
+function handleShowProfile (req,res){
+    try {
+        res.json({message:"this is the user profle after the auth"})
+    } catch (error) {
+        console.error("Error occurred:", error);
+        res.status(500).json({ message: "Internal server error at profile" });
+    }
+}
+
 module.exports = {
     handleUserSignup,
     handleUserLogin,
+    handleShowProfile
 };
